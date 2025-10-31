@@ -201,10 +201,10 @@ def scrape_books(is_save: bool, pages_url: str):
         # url_site = f"http://books.toscrape.com/catalogue/page-{pages_site}.html"
 
     if is_save:
-        with open("books_data.txt", "w") as f:
+        with open("artifacts/books_data.txt", "w") as f:
             f.write("")
         for book in book_list:
-            with open("books_data.txt", "a") as f:
+            with open("artifacts/books_data.txt", "a") as f:
                 json.dump(book, f, indent=4)
 
     print(datetime.datetime.now())
