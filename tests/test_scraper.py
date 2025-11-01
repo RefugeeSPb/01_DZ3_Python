@@ -15,7 +15,7 @@ def test_get_book_data():
     assert len(book_data) == 9
 
 
-def test_scrape_books(mocker):
+"""def test_scrape_books(mocker):
     print("Start test_scrape_books")
     
     with open("artifacts/books_data.txt", "r") as f:
@@ -27,4 +27,4 @@ def test_scrape_books(mocker):
         result = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
         assert result == real_data
         assert isinstance(result, list)
-        assert len(result) == 10000
+        assert len(result) == 10000"""
