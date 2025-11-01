@@ -29,12 +29,11 @@ def get_book_data(book_url: str) -> dict:
         'Product Information': 'Дополнительные характеристики'  --Данные список будет выводится по всем возможным дополнительным параметрам
      }
 
-     аргументы: ссылка на книгу в формате str
+     аргументы: 
+     book_url (str): ссылка на определенный сайт с книгой в формате str
 
-      методы:
-      pass
-
-     return: словарь с данными о книге
+     return: 
+     dict: словарь с данными о книге
 
     >>>book_url = "http://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
     >>>get_book_data(book_url)
@@ -151,7 +150,39 @@ def get_book_data(book_url: str) -> dict:
 
 def scrape_books(is_save: bool, pages_url: str):
     """
-    МЕСТО ДЛЯ ДОКУМЕНТАЦИИ
+    Функция для получения данных о книгах на определенном сайте
+
+    Функция должна искать ссылки на все страницы книг
+    далее при помощи функции get_book_data собрать данные о каждой книге и вернуть их.
+    Если сайт оканчивается (ошибка 404), то функция останавливается.
+    В случае если is_save == True, сохраните данные в JSON файл.
+
+    В итоге возвращает список книг с такими данными:
+    - Название
+    - Цена
+    - Рейтинг
+    - Количество в наличии
+    - Описание
+    - Дополнительные характеристики
+
+    Аргументы:
+    is_save (bool): если True, то создает файл с нуля и сохраняет в него данные.
+    В противном случае - ничего не делает.
+    Сохраняет файл artifacts/books_data.txt в формате JSON
+
+    pages_url (str): ссылка на сайт с книгами. Выглядит как шаблон с переменной N - номер страницы.
+
+    Возвращает:
+    list[dict]: список словарей с данными о книгах.
+
+    Пример:
+        books = scrape_books(
+            is_save=True,
+            pages_url="http://books.toscrape.com/catalogue/page-{N}.html"
+        )
+        print(len(books))
+
+        >>>1000
     """
 
     # НАЧАЛО ВАШЕГО РЕШЕНИЯ
@@ -176,8 +207,8 @@ def scrape_books(is_save: bool, pages_url: str):
             "article", class_="product_pod"
         )
         book_i = 1
-        #Для каждой книги определяем ссылку.
-        #Далее вытаскиваем данные по каждой книге по ссылке. Сохраняем в список
+        # Для каждой книги определяем ссылку.
+        # Далее вытаскиваем данные по каждой книге по ссылке. Сохраняем в список
         for book_pages in req_pages_html_find:
             book_url = book_pages.find("a").get("href")  # type: ignore
             percent_time = ((pages_site - 1) * 20 + book_i) / (50 * 20) * 100
@@ -199,4 +230,4 @@ def scrape_books(is_save: bool, pages_url: str):
 
 if __name__ == "__main__":
     res = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
-    print(res)
+    print(f"Собрано {len(res)} книг")
