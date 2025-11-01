@@ -65,9 +65,9 @@ def get_book_data(book_url: str) -> dict:
 
     # Получаем данные о книге. Проверяем подключение
     try:
-        req_book = requests.get(book_url)
+        timeout = (7, 11) 
+        req_book = requests.get(book_url, timeout=timeout)
         req_book.raise_for_status()
-        timeout = (7, 11)  # noqa: F841
     except req_book.HTTPError as err: # type: ignore
         return print(f"Возникла ошибка: {err}")  # type: ignore # надо ли вообще?
 
@@ -204,7 +204,7 @@ def scrape_books(is_save: bool, pages_url: str):
         with open("artifacts/books_data.txt", "w") as f:
                 json.dump(book_list, f, indent=4)
 
-    print(datetime.datetime.now())
+    #print(datetime.datetime.now())
     return book_list
 
 

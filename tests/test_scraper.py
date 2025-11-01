@@ -1,48 +1,90 @@
 import pytest
 import json
+import inspect
 from unittest.mock import patch
-
 from scraper import get_book_data, scrape_books
 
 
+"""
+    ######################################
+    Зона начала тестирования get_book_data 
+    ######################################
+"""
+
+""" Setup_book_url """
+book_url = "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
+book_data = get_book_data(book_url)
+
+
+
+"""Тест для проверки, что функция возвращает словарь"""
+#@pytest.mark.skip(reason="Тестирование функции scape_books")
 def test_get_book_data_dict():
-    print("Start test_get_book_data")
-    book_url = "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
-    book_data = get_book_data(book_url)
+    print(f"Start {inspect.currentframe().f_code.co_name}", end="\n")
     assert isinstance(book_data, dict)
 
 
 
+"""Тест для проверки наличия ключа "name" в словаре"""
+#@pytest.mark.skip(reason="Тестирование функции scape_books")
 def test_get_book_data_check():
-    print("Start test_get_book_data")
-    book_url = "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
-    book_data = get_book_data(book_url)
+    print(f"Start {inspect.currentframe().f_code.co_name}", end="\n")
     assert "name" in book_data
 
 
+"""Тест для проверки типа значения ключа "name" в словаре"""
+#@pytest.mark.skip(reason="Тестирование функции scape_books")
 def test_get_book_data_str():
-    print("Start test_get_book_data")
-    book_url = "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
-    book_data = get_book_data(book_url)
+    print(f"Start {inspect.currentframe().f_code.co_name}", end="\n")
     assert isinstance(book_data["name"], str)
 
-    
+
+"""Тест для проверки длины словаря"""
+#@pytest.mark.skip(reason="Тестирование функции scape_books")
 def test_get_book_data_len():
-    print("Start test_get_book_data")
-    book_url = "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
-    book_data = get_book_data(book_url)   
+    print(f"Start {inspect.currentframe().f_code.co_name}", end="\n")
     assert len(book_data) == 9
 
 
-def test_scrape_books():
-    print("Start test_scrape_books")
-    
-    with open("artifacts/books_data.txt", "r") as f:
-        real_data = json.load(f)
-    
-    with patch("scraper.get_book_data") as mock_get_book_data:
-        mock_get_book_data.side_effect = real_data
-        result = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
-        assert result == real_data
-        assert isinstance(result, list)
-        assert len(result) == 1000
+"""
+    Зона окончания тестирования get_book_data 
+"""
+
+
+"""
+    #####################################
+    Зона начала тестирования scrape_books
+    #####################################
+"""
+"""Создаем данные для проверки"""
+with open("artifacts/books_data.txt", "r") as f:
+    real_data = json.load(f)
+
+"""Создаем мок-функцию"""
+with patch("scraper.get_book_data") as mock_get_book_data:
+    mock_get_book_data.side_effect = real_data
+    result = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
+
+
+"""тестирование, что ожидаем определенный список данных"""
+# @pytest.mark.skip(reason="Тестирование функции get_book_data")
+def test_scrape_books_data():
+    print(f"Start {inspect.currentframe().f_code.co_name}", end="\n")
+    assert result == real_data
+
+"""тестирование, что функция возвращает список"""
+#@pytest.mark.skip(reason="Тестирование функции get_book_data")
+def test_scrape_books_list():
+    print(f"Start {inspect.currentframe().f_code.co_name}/n")
+    assert isinstance(result, list)
+
+"""тестирование, что функция возвращает список длиной 1000"""
+#@pytest.mark.skip(reason="Тестирование функции get_book_data")
+def test_scrape_books_len():
+    print(f"Start {inspect.currentframe().f_code.co_name}/n")
+    assert len(result) == 1000
+
+
+"""
+    Зона окончания тестирования scrape_books
+"""
