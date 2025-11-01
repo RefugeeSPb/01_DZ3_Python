@@ -1,5 +1,6 @@
 import pytest
 import json
+from unittest.mock import patch
 
 from scraper import get_book_data, scrape_books
 
@@ -16,8 +17,14 @@ def test_get_book_data():
 
 def test_scrape_books(mocker):
     print("Start test_scrape_books")
-    mocker.patch(
-            "scraper.get_book_data",
-            return_value={"name": "Test Book", "price": "£5.00"}
-        )
-    assert
+    
+    with open("artifacts/books_data.txt", "r") as f:
+        real_data = json.load(f)
+    
+    with patch("scraper.get_book_data") as mock_get_book_data:
+        mock_get_book.return_value = real_data
+
+        result = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
+        assert result == real_data
+        assert isinstance(result, list)
+        assert len(result) == 10000

@@ -221,3 +221,7 @@ if __name__ == "__main__":
         "http://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
     )
     get_book_data(book_url)
+
+
+
+scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
