@@ -1,4 +1,3 @@
-import datetime
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -65,10 +64,10 @@ def get_book_data(book_url: str) -> dict:
 
     # Получаем данные о книге. Проверяем подключение
     try:
-        timeout = (7, 11) 
+        timeout = (7, 11)
         req_book = requests.get(book_url, timeout=timeout)
         req_book.raise_for_status()
-    except req_book.HTTPError as err: # type: ignore
+    except req_book.HTTPError as err:  # type: ignore
         return print(f"Возникла ошибка: {err}")  # type: ignore # надо ли вообще?
 
     # Имеем HTML формат. Так как мы парсим опредлеленный сайт, то мы не проверяем тип данных
@@ -83,11 +82,11 @@ def get_book_data(book_url: str) -> dict:
     req_book_html = BeautifulSoup(req_book.text, "html.parser")
 
     # 1. Заранее определяем, что h1 - название книги. Ищем и вставляем название в словарь
-    book_name = req_book_html.find("h1").text.strip() # type: ignore
+    book_name = req_book_html.find("h1").text.strip()  # type: ignore
     book_dict.update({"name": str(book_name)})
 
     # 2. Заранее определяем, что p - цена книги. Ищем и вставляем название в словарь
-    book_price = req_book_html.find("p", class_="price_color").text.strip()[1:] # type: ignore
+    book_price = req_book_html.find("p", class_="price_color").text.strip()[1:]  # type: ignore
     book_dict.update({"price euro": float(book_price)})
 
     # 3. Рейтинг (ищем элемент с классом star-rating и извлекаем подкласс)
@@ -97,19 +96,19 @@ def get_book_data(book_url: str) -> dict:
 
     # 4. Остатки (ищем элемент с классом p - instock availability извлекаем позиции чисел)
     stock_element_start = (
-        req_book_html.find("p", class_="instock availability").text.strip().find("(") # type: ignore
+        req_book_html.find("p", class_="instock availability").text.strip().find("(")  # type: ignore
         + 1
     )
     stock_element_end = (
         req_book_html.find("p", class_="instock availability")
-        .text.strip() # type: ignore
+        .text.strip()  # type: ignore
         .find(" available")
     )
     # print(req_book_html.find("p", class_="instock availability").text.strip()[stock_element_start:stock_element_end])
     book_dict.update(
         {
             "stock": int(
-                req_book_html.find("p", class_="instock availability").text.strip()[ # type: ignore
+                req_book_html.find("p", class_="instock availability").text.strip()[  # type: ignore
                     stock_element_start:stock_element_end
                 ]
             )
@@ -120,8 +119,8 @@ def get_book_data(book_url: str) -> dict:
     try:
         description_element = (
             req_book_html.find("div", id="product_description")
-            .find_next("p") # type: ignore
-            .text.strip() # type: ignore
+            .find_next("p")  # type: ignore
+            .text.strip()  # type: ignore
         )
         book_dict.update({"Decription": str(description_element)})
     except:  # noqa: E722
@@ -129,7 +128,7 @@ def get_book_data(book_url: str) -> dict:
 
     # 6. Product Information. По всем строкам table/tr ищем по th - key, по td - value.
     product_info_element_key = (
-        req_book_html.find("h2", string="Product Information") # type: ignore
+        req_book_html.find("h2", string="Product Information")  # type: ignore
         .find_next("table")
         .find_all("tr")
     )
@@ -156,60 +155,48 @@ def scrape_books(is_save: bool, pages_url: str):
     """
 
     # НАЧАЛО ВАШЕГО РЕШЕНИЯ
-    # http://books.toscrape.com/catalogue/page-{N}.html
-    # http://books.toscrape.com/catalogue/page-1.html
-    # http://books.toscrape.com/catalogue/page-51.html     51 страница - 404
-
-    # Стартуем с первой страницы
+    # Стартуем с первой страницы. Готовим первую ссылку
     pages_site = 1
-    # url_site = f"http://books.toscrape.com/catalogue/page-{pages_site}.html"
     url_site = pages_url.format(N=pages_site)
     book_list = []
-    # Пока не выпадем в ошибку
+    # Будем парсить сайты, пока на наткнемся на 404 ошибку (51 стр.)
     while True:
-        # while pages_site <= 3:
-        req_pages = requests.get(url_site)
-        # print(url_site)
-        timeout = (7, 11)  # noqa: F841
+        timeout = (7, 11)
+        req_pages = requests.get(url_site, timeout=timeout)
         # проверка на ошибку
         if req_pages.status_code == 404:
             break
 
+        # Меняем кодировку
         req_pages.encoding = "utf-8"
+        # Парсим данные по html
         req_pages_html = BeautifulSoup(req_pages.text, "html.parser")
-        # print(req_pages_html.prettify())
-        req_pages_html_find = req_pages_html.find("ol", class_="row").find_all( # type: ignore
+        # Определяем секцию, в которой расположены книги
+        req_pages_html_find = req_pages_html.find("ol", class_="row").find_all(  # type: ignore
             "article", class_="product_pod"
         )
-        # print(req_pages_html_find)
         book_i = 1
-        # book_list = []
+        #Для каждой книги определяем ссылку.
+        #Далее вытаскиваем данные по каждой книге по ссылке. Сохраняем в список
         for book_pages in req_pages_html_find:
-            book_url = book_pages.find("a").get("href") # type: ignore
-            # print(f"Page:{pages_site}, №{book_i}. URL: {book_url}")
+            book_url = book_pages.find("a").get("href")  # type: ignore
             percent_time = ((pages_site - 1) * 20 + book_i) / (50 * 20) * 100
             print(f"{percent_time:.2f}%", end="\r", flush=True)
             book_list.append(
                 get_book_data(f"http://books.toscrape.com/catalogue/{book_url}")
             )
             book_i += 1
-
-        # print(book_list)
-
         pages_site += 1
         url_site = pages_url.format(N=pages_site)
-        # url_site = f"http://books.toscrape.com/catalogue/page-{pages_site}.html"
 
+    # Сохраняем в файл в формате json, если указан True
     if is_save:
         with open("artifacts/books_data.txt", "w") as f:
-                json.dump(book_list, f, indent=4)
+            json.dump(book_list, f, indent=4)
 
-    #print(datetime.datetime.now())
     return book_list
 
 
 if __name__ == "__main__":
     res = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
     print(res)
-
-
