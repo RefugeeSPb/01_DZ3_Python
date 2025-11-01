@@ -202,10 +202,7 @@ def scrape_books(is_save: bool, pages_url: str):
 
     if is_save:
         with open("artifacts/books_data.txt", "w") as f:
-            f.write("")
-        for book in book_list:
-            with open("artifacts/books_data.txt", "a") as f:
-                json.dump(book, f, indent=4)
+                json.dump(book_list, f, indent=4)
 
     print(datetime.datetime.now())
     return book_list
@@ -216,12 +213,3 @@ if __name__ == "__main__":
     print(res)
 
 
-if __name__ == "__main__":
-    book_url = (
-        "http://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
-    )
-    get_book_data(book_url)
-
-
-
-scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")

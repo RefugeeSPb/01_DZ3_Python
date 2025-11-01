@@ -15,16 +15,15 @@ def test_get_book_data():
     assert len(book_data) == 9
 
 
-"""def test_scrape_books(mocker):
+def test_scrape_books():
     print("Start test_scrape_books")
     
     with open("artifacts/books_data.txt", "r") as f:
         real_data = json.load(f)
     
     with patch("scraper.get_book_data") as mock_get_book_data:
-        mock_get_book.return_value = real_data
-
+        mock_get_book_data.side_effect = real_data
         result = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
         assert result == real_data
         assert isinstance(result, list)
-        assert len(result) == 10000"""
+        assert len(result) == 1000
