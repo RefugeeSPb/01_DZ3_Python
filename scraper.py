@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -29,10 +30,10 @@ def get_book_data(book_url: str) -> dict:
         'Product Information': 'Дополнительные характеристики'  --Данные список будет выводится по всем возможным дополнительным параметрам
      }
 
-     аргументы: 
+     аргументы:
      book_url (str): ссылка на определенный сайт с книгой в формате str
 
-     return: 
+     return:
      dict: словарь с данными о книге
 
     >>>book_url = "http://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
@@ -148,7 +149,7 @@ def get_book_data(book_url: str) -> dict:
     # КОНЕЦ ВАШЕГО РЕШЕНИЯ
 
 
-def scrape_books(is_save: bool, pages_url: str):
+def scrape_books(is_save: bool, pages_url: str, directory_save: str):
     """
     Функция для получения данных о книгах на определенном сайте
 
@@ -172,6 +173,9 @@ def scrape_books(is_save: bool, pages_url: str):
 
     pages_url (str): ссылка на сайт с книгами. Выглядит как шаблон с переменной N - номер страницы.
 
+    directory_save: str
+        Путь к директории, в которой будет создан файл с данными о книгах.
+
     Возвращает:
     list[dict]: список словарей с данными о книгах.
 
@@ -179,6 +183,7 @@ def scrape_books(is_save: bool, pages_url: str):
         books = scrape_books(
             is_save=True,
             pages_url="http://books.toscrape.com/catalogue/page-{N}.html"
+            directory_save="artifacts"
         )
         print(len(books))
 
@@ -222,12 +227,21 @@ def scrape_books(is_save: bool, pages_url: str):
 
     # Сохраняем в файл в формате json, если указан True
     if is_save:
-        with open("artifacts/books_data.txt", "w") as f:
-            json.dump(book_list, f, indent=4)
+        try:
+            with open(f"{directory_save}/books_data.txt", "w") as f:
+                json.dump(book_list, f, indent=4)
+        except FileNotFoundError:
+            os.makedirs(directory_save)
+            with open(f"{directory_save}/books_data.txt", "w") as f:
+                json.dump(book_list, f, indent=4)
 
     return book_list
 
 
 if __name__ == "__main__":
-    res = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
+    res = scrape_books(
+        is_save=True,
+        pages_url="http://books.toscrape.com/catalogue/page-{N}.html",
+        directory_save="artifacts",
+    )
     print(f"Собрано {len(res)} книг")

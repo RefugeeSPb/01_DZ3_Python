@@ -63,7 +63,7 @@ with open("artifacts/books_data.txt", "r") as f:
 """Создаем мок-функцию"""
 with patch("scraper.get_book_data") as mock_get_book_data:
     mock_get_book_data.side_effect = real_data
-    result = scrape_books(True, "http://books.toscrape.com/catalogue/page-{N}.html")
+    result = scrape_books(is_save = True, pages_url="http://books.toscrape.com/catalogue/page-{N}.html", directory_save="artifacts")
 
 
 """тестирование, что ожидаем определенный список данных"""
