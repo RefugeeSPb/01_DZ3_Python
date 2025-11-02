@@ -197,8 +197,12 @@ def scrape_books(is_save: bool, pages_url: str, directory_save: str):
     book_list = []
     # Будем парсить сайты, пока на наткнемся на 404 ошибку (51 стр.)
     while True:
-        timeout = (7, 11)
-        req_pages = requests.get(url_site, timeout=timeout)
+        try:
+            timeout = (7, 11)
+            req_pages = requests.get(url_site, timeout=timeout)
+        except req_pages.HTTPError as err:  # type: ignore
+            return print(f"Возникла ошибка: {err}")  # type: ignore # надо ли вообще?
+        
         # проверка на ошибку
         if req_pages.status_code == 404:
             break
